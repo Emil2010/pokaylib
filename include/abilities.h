@@ -1,5 +1,4 @@
-#ifndef ABILITIES_H
-#define ABILITIES_H
+#pragma once
 
 typedef enum {  // up to gen-9 because we can implement them :)
     NO_ABILITY,
@@ -310,5 +309,3 @@ typedef enum {  // up to gen-9 because we can implement them :)
     TERAFORM_ZERO,
     POISON_PUPPETEER
 } Ability;
-
-#endif  // ABILITIES_H

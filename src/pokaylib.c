@@ -1,10 +1,8 @@
-#include <stdio.h>
 #include <stdlib.h>
 
-#include "../../raylib-5.x/src/raylib.h"
-#include "../../raylib-5.x/src/raymath.h"
-#include "../include/pokaylib.h"
-#include "../include/config.h"
+#include <raylib.h>
+#include "pokaylib.h"
+#include "config.h"
 
 
 /*  @info Builds a frame array (or a single frame) for sprite/animated sprite
@@ -16,7 +14,7 @@
  *  @param spriteOffset - how much sprite to skip (spritesheet-wise) until you get to the first frame of the sprite you want to make */
 Sprite MakeSprite(const char *spritesheetPath, u8 spriteNumber, u8 spriteWidth, u8 spriteHeight, u8 spriteOffset)
 {
-    #if DEBUG
+    #ifdef DEBUG
         TraceLog(LOG_DEBUG, "Making sprite @ [%s]", spritesheetPath);
         TraceLog(LOG_DEBUG, "    Sprite number:\t%d", spriteNumber);
         TraceLog(LOG_DEBUG, "    Sprite width:\t%dpx", spriteWidth);
@@ -92,6 +90,7 @@ Map MakeMap(Map loadedMap)
     map.tileHeight = loadedMap.tileHeight;
     map.layersNumber = loadedMap.layersNumber;
     map.tilesNumber = loadedMap.tilesNumber;
+    map.mapID = 0x55;
     map.tileset = MakeSprite(loadedMap.tilesetPath, loadedMap.tilesetSpritesNumber, loadedMap.tileWidth, loadedMap.tileHeight, 0);
 
     // Dynamic tiles/layers allocation
@@ -103,7 +102,7 @@ Map MakeMap(Map loadedMap)
         }
     }
 
-    #if DEBUG
+    #ifdef DEBUG
         TraceLog(LOG_DEBUG, "Making map (ID: %d) @ [%s]", map.mapID, loadedMap.tilesetPath);
         TraceLog(LOG_DEBUG, "    Map width:\t%d", map.width);
         TraceLog(LOG_DEBUG, "    Map height:\t%d", map.height);

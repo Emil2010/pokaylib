@@ -1,4 +1,4 @@
-#include "../../include/pokaylib.h"
+#include "pokaylib.h"
 
 #define MAP_WIDTH 13
 #define MAP_HEIGHT 10

@@ -1,5 +1,4 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
 
 #define GAMEBOY_SCREEN_WIDTH        160
 #define GAMEBOY_SCREEN_HEIGHT       144
@@ -22,9 +21,10 @@
 #define GENERATION_HGSS
 #define GENERATION_BLACK_WHITE
 
-#define DEBUG true
+#ifndef NDEBUG
+# define DEBUG
+#endif
+
 #define SCALING_FACTOR 3
 #define SCREEN_WIDTH NINTENDO_DS_SCREEN_WIDTH
 #define SCREEN_HEIGHT NINTENDO_DS_SCREEN_HEIGHT
-
-#endif // CONFIG_H

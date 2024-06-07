@@ -1,5 +1,4 @@
-#ifndef MOVES_H
-#define MOVES_H
+#pragma once
 
 typedef enum {  // up to gen-5 moves (because we have the sprites)
     NO_MOVE,
@@ -564,4 +563,3 @@ typedef enum {  // up to gen-5 moves (because we have the sprites)
     FUSION_BOLT,
 } Move;
 
-#endif // MOVES_H
