@@ -1,11 +1,10 @@
-#ifndef POKAYLIB_H
-#define POKAYLIB_H
+#pragma once
 
 #include <stdint.h>
-#include "../../raylib-5.x/src/raylib.h"
+#include <raylib.h>
 
-#include "../include/abilities.h"
-#include "../include/moves.h"
+#include "abilities.h"
+#include "moves.h"
 
 // Typedef ----------------------------------------------------
 typedef uint8_t u8;     //    256
@@ -129,6 +128,3 @@ void DrawSprite(Sprite sprite, u8 frameIndex, u8 scalingFactor, Vector2 position
 Map MakeMap(Map data);
 void DrawMapLayer(Map map, u8 layerIndex, u8 scalingFactor);
 void DestroyMap(Map map);
-
-
-#endif // POKAYLIB_H

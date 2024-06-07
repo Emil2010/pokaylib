@@ -1,13 +1,11 @@
 #include <stdio.h>  // sprintf (debug)
-#include <stdlib.h>
 
-#include "../../raylib-5.x/src/raylib.h"
-#include "../../raylib-5.x/src/raymath.h"
-#include "../include/pokaylib.h"
-#include "../include/config.h"
+#include <raylib.h>
+#include "pokaylib.h"
+#include "config.h"
 
 int main(void) {
-    #if DEBUG
+    #ifdef DEBUG
         SetTraceLogLevel(LOG_ALL);
         TraceLog(LOG_DEBUG, "salut :)");
 
@@ -15,7 +13,6 @@ int main(void) {
         char textY[16] = {0};
         // char textFrame[16] = {0};
     #endif
-
     int screenWidth = SCREEN_WIDTH * SCALING_FACTOR;
     int screenHeight = SCREEN_HEIGHT * SCALING_FACTOR;
 
@@ -77,7 +74,7 @@ int main(void) {
         }
 
         // Debug ----------------------------------------------
-        #if DEBUG
+        #ifdef DEBUG
             sprintf(textX, "%.0f", player.position.x);
             sprintf(textY, "%.0f", player.position.y);
             //sprintf(textFrame, "%d", playerIDX);
@@ -102,7 +99,7 @@ int main(void) {
 
             // draw front tiles
 
-            #if DEBUG
+            #ifdef DEBUG
                 // cross
                 DrawLine(screenWidth/2, 0, screenWidth/2, screenHeight, RAYWHITE);
                 DrawLine(0, screenHeight/2, screenWidth, screenHeight/2, RAYWHITE);

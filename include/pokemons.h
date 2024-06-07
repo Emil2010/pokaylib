@@ -1,5 +1,4 @@
-#ifndef POKEMONS_H
-#define POKEMONS_H
+#pragma once
 
 typedef enum {
     NO_POKEMON,
@@ -657,5 +656,3 @@ typedef enum {
     MELOETTA,
     GENESECT,
 } Pokemon;
-
-#endif // POKEMONS_H
