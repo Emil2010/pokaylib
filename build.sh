@@ -1,68 +1,52 @@
 #!/bin/sh
-# Change your executable name here
-GAME_NAME="pokaylib"
+# Change your build directory name and executable name here
+BUILD_DIR="build"
+GAME_NAME="pokexec"
+ROOT_DIR=$PWD
 
-# Set your sources here (relative paths!)
-# Example with two source folders:
-# SOURCES="src/*.c src/submodule/*.c"
-SOURCES="src/*.c src/maps/*.c"
-
-# Set your raylib/src location here (relative path!)
-RAYLIB_SRC="../raylib-5.x/src"
-
-# About this build script: it does many things, but in essence, it's
-# very simple. It has 3 compiler invocations: building raylib (which
-# is not done always, see logic by searching "Build raylib"), building
-# src/*.c files, and linking together those two. Each invocation is
-# wrapped in an if statement to make the -qq flag work, it's pretty
-# verbose, sorry.
+# ANSI escape codes for colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
 # Stop the script if a compilation (or something else?) fails
 set -e
 
 # Get arguments
-while getopts ":hdusrcq" opt; do
+while getopts ":hcdvsr" opt; do
     case $opt in
         h)
-            echo "Usage: ./build-osx.sh [-hdusrcqq]"
+            echo "Usage: ./build.sh [-hcdvsr]"
             echo " -h  Show this information"
+            echo " -c  Remove the build directory, ie. full recompile"
             echo " -d  Faster builds that have debug symbols, and enable warnings"
-            echo " -u  Run upx* on the executable after compilation (before -r)"
+            echo " -v  More detailed output from the final make command"
             echo " -s  Run strip on the executable after compilation (before -r)"
             echo " -r  Run the executable after compilation"
-            echo " -c  Remove the temp/(debug|release) directory, ie. full recompile"
-            echo " -q  Suppress this script's informational prints"
-            echo ""
-            echo "* This is mostly here to make building simple \"shipping\" versions"
-            echo "  easier, and it's a very small bit in the build scripts. The option"
-            echo "  requires that you have upx installed and on your path, of course."
             echo ""
             echo "Examples:"
-            echo " Build a release build:                    ./build-osx.sh"
-            echo " Build a release build, full recompile:    ./build-osx.sh -c"
-            echo " Build a debug build and run:              ./build-osx.sh -d -r"
-            echo " Build in debug, run, don't print at all:  ./build-osx.sh -drqq"
+            echo " Build a release build:                               ./build.sh"
+            echo " Build a release build, with make verbose:            ./build.sh -v"
+            echo " Build a release build, full recompile, stripped :    ./build.sh -cs"
+            echo " Build a debug build and run:                         ./build.sh -dr"
             exit 0
+            ;;
+        c)
+            BUILD_ALL="1"
             ;;
         d)
             BUILD_DEBUG="1"
             ;;
-        u)
-            UPX_IT="1"
+        v)
+            VERBOSE="1"
             ;;
         s)
             STRIP_IT="1"
             ;;
         r)
             RUN_AFTER_BUILD="1"
-            ;;
-        c)
-            BUILD_ALL="1"
-            ;;
-        q)
-            if [ -n "$QUIET" ]; then
-                QUIET="1"
-            fi
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
@@ -71,93 +55,73 @@ while getopts ":hdusrcq" opt; do
     esac
 done
 
-# Set CC if it's not set already
-if [ -z "$CC" ]; then
-    CC=cc
+# Remove the build directory if it exists to do a full recompile
+if [ -d "$BUILD_DIR" ] && [ -n "$BUILD_ALL" ]; then
+    rm -r "$BUILD_DIR"
 fi
 
-# Directories
-ROOT_DIR=$PWD
-SOURCES="$ROOT_DIR/$SOURCES"
-RAYLIB_SRC="$ROOT_DIR/$RAYLIB_SRC"
-
-# Flags
-OUTPUT_DIR=""
-COMPILATION_FLAGS="-std=c99 -O2 -flto"
-FINAL_COMPILE_FLAGS="-s"
-WARNING_FLAGS="-Wall -Wextra -Wpedantic"
-LINK_FLAGS="-flto -framework OpenGL -framework OpenAL -framework IOKit -framework CoreVideo -framework Cocoa"
-# Debug changes to flags
-if [ -n "$BUILD_DEBUG" ]; then
-    OUTPUT_DIR=""
-    COMPILATION_FLAGS="-std=c99 -O0 -g"
-    FINAL_COMPILE_FLAGS=""
-    LINK_FLAGS="-framework OpenGL -framework OpenAL -framework IOKit -framework CoreVideo -framework Cocoa"
+# Create a build directory if it does not exist yet
+if [ ! -d "$BUILD_DIR" ]; then
+    mkdir $BUILD_DIR
 fi
+cd $BUILD_DIR
 
-# Display what we're doing
+# Display what we're doing and executing cmake
 if [ -n "$BUILD_DEBUG" ]; then
-    [ -z "$QUIET" ] && echo "COMPILE-INFO: Compiling in debug mode. ($COMPILATION_FLAGS $WARNING_FLAGS)"
+    echo "${YELLOW}COMPILE-INFO:${NC} Compiling in debug mode."
+    cmake -DCMAKE_BUILD_TYPE=Debug ..
 else
-    [ -z "$QUIET" ] && echo "COMPILE-INFO: Compiling in release mode. ($COMPILATION_FLAGS $FINAL_COMPILE_FLAGS)"
+    echo "${YELLOW}COMPILE-INFO:${NC} Compiling in release mode."
+    cmake -DCMAKE_BUILD_TYPE=Release ..
 fi
 
-# Create the raylib cache directory
-TEMP_DIR="temp/release"
-if [ -n "$BUILD_DEBUG" ]; then
-    TEMP_DIR="temp/debug"
-fi
-# If there's a -c flag, remove the cache
-if [ -d "$TEMP_DIR" ] && [ -n "$BUILD_ALL" ]; then
-    [ -z "$QUIET" ] && echo "COMPILE-INFO: Found cached raylib, rebuilding."
-    rm -r "$TEMP_DIR"
-fi
-# If temp directory doesn't exist, build raylib
-if [ ! -d "$TEMP_DIR" ]; then
-    mkdir -p $TEMP_DIR
-    cd $TEMP_DIR
-    RAYLIB_DEFINES="-D_DEFAULT_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33"
-    RAYLIB_C_FILES="$RAYLIB_SRC/rcore.c $RAYLIB_SRC/rshapes.c $RAYLIB_SRC/rtextures.c $RAYLIB_SRC/rtext.c $RAYLIB_SRC/rmodels.c $RAYLIB_SRC/utils.c $RAYLIB_SRC/raudio.c"
-    RAYLIB_INCLUDE_FLAGS="-I$RAYLIB_SRC -I$RAYLIB_SRC/external/glfw/include"
-
-    $CC -c $RAYLIB_DEFINES $RAYLIB_INCLUDE_FLAGS $COMPILATION_FLAGS -x objective-c $RAYLIB_SRC/rglfw.c
-    $CC -c $RAYLIB_DEFINES $RAYLIB_INCLUDE_FLAGS $COMPILATION_FLAGS $RAYLIB_C_FILES
-
-    [ -z "$QUIET" ] && echo "COMPILE-INFO: raylib compiled into object files in: $TEMP_DIR/"
-    cd $ROOT_DIR
-fi
-
-# Build the actual game
-[ -z "$QUIET" ] && echo "COMPILE-INFO: Compiling game code."
-$CC -c -I$RAYLIB_SRC $SOURCES $COMPILATION_FLAGS $WARNING_FLAGS
-if [ -n "$BUILD_DEBUG" ]; then
-    $CC -o $GAME_NAME-debug $ROOT_DIR/$TEMP_DIR/*.o *.o $LINK_FLAGS
+# Execute the final make command
+if [ -n "$VERBOSE" ]; then
+    make VERBOSE=1
 else
-    $CC -o $GAME_NAME-release $ROOT_DIR/$TEMP_DIR/*.o *.o $LINK_FLAGS
+    make
 fi
 
-rm *.o # somehow cest bizarre ca
+# End of compilation messages
+echo "${YELLOW}COMPILE-INFO:${NC} Compilation done \c"
+if [ -n "$BUILD_DEBUG" ]; then
+    echo "(debug)."
+else
+    echo "(release)."
+fi
+echo "${YELLOW}COMPILE-INFO:${NC} Game compiled into an executable in: ${RED}$ROOT_DIR/$BUILD_DIR/${NC}"
 
-[ -z "$QUIET" ] && echo "COMPILE-INFO: Game compiled into an executable in: $ROOT_DIR/"
-
+# Strip the executable
 if [ -n "$STRIP_IT" ]; then
-    [ -z "$QUIET" ] && echo "COMPILE-INFO: Stripping $GAME_NAME."
-    strip $GAME_NAME-release
+    strip pokexec
+    echo "${YELLOW}COMPILE-INFO:${NC} $GAME_NAME has been stripped."
 fi
 
-if [ -n "$UPX_IT" ]; then
-    [ -z "$QUIET" ] && echo "COMPILE-INFO: Packing $GAME_NAME with upx."
-    upx $GAME_NAME > /dev/null 2>&1
+# Display sizes
+lib_size=$(du -sh "libpokaylib.a" | cut -f1 | sed 's/K/ko/' | sed 's/M/Mo/')
+exec_size=$(du -sh "pokexec" | cut -f1 | sed 's/K/ko/' | sed 's/M/Mo/')
+assets_size=$(du -sh "assets" | cut -f1 | sed 's/M/Mo/' | sed 's/G/Go/')
+
+max_width=13
+game_name_length=${#GAME_NAME}
+if (( game_name_length > max_width )); then
+    max_width=$game_name_length
 fi
 
+echo "╔══════════════════════════════════╗"
+printf "║ ${BLUE}%s${NC} %-${max_width}s %7s ║\n" "SIZE-INFO:" "libpokaylib.a" "$lib_size"
+printf "║ ${BLUE}%s${NC} %-${max_width}s %7s ║\n" "SIZE-INFO:" "$GAME_NAME" "$exec_size"
+printf "║ ${BLUE}%s${NC} %-${max_width}s %7s ║\n" "SIZE-INFO:" "assets/..." "$assets_size"
+echo "╚══════════════════════════════════╝"
+
+# Grant execute permission and rename it
+chmod +x pokexec
+mv pokexec "$GAME_NAME"
+
+# Run the executable after all the build process
 if [ -n "$RUN_AFTER_BUILD" ]; then
-    [ -z "$QUIET" ] && echo "COMPILE-INFO: Running."
-    if [ -n "$BUILD_DEBUG" ]; then
-        ./$GAME_NAME-debug
-    else
-        ./$GAME_NAME-release
-    fi
+    ./"$GAME_NAME"
 fi
-cd $ROOT_DIR
 
-[ -z "$QUIET" ] && echo "COMPILE-INFO: All done."
+# Go back to the root directory
+cd ..

@@ -173,3 +173,6 @@ $RECYCLE.BIN/
 
 build/
 .cache/
+roadmap.md
+.DS_Store
+.DS_Store
