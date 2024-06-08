@@ -28,8 +28,8 @@ Usage: ./build.sh [-hcdvsr]
 
 Example:
 ```
->~$ cd pokaylib
->~$ ./build.sh -d
+~$ cd pokaylib
+~$ ./build.sh -d
 ```
 Will create a `build/` directory in which the final executable will be compiled in debug mode.
 You can change the build directory name in the `build.sh` script, as well as the final executable name (default is `pokexec`).
