@@ -18,19 +18,23 @@ set -e
 while getopts ":hcdvsr" opt; do
     case $opt in
         h)
-            echo "Usage: ./build.sh [-hcdvsr]"
+            echo "Usage: ${YELLOW}./build.sh [-hcdvsr]${NC}"
             echo " -h  Show this information"
             echo " -c  Remove the build directory, ie. full recompile"
             echo " -d  Faster builds that have debug symbols, and enable warnings"
-            echo " -v  More detailed output from the final make command"
+            echo " -v  More detailed output from CMake and Make"
             echo " -s  Run strip on the executable after compilation (before -r)"
             echo " -r  Run the executable after compilation"
             echo ""
             echo "Examples:"
-            echo " Build a release build:                               ./build.sh"
-            echo " Build a release build, with make verbose:            ./build.sh -v"
-            echo " Build a release build, full recompile, stripped :    ./build.sh -cs"
-            echo " Build a debug build and run:                         ./build.sh -dr"
+            echo " Build a release build:                               ${YELLOW}./build.sh${NC}"
+            echo " Build a release build, with Make verbose:            ${YELLOW}./build.sh -v${NC}"
+            echo " Build a release build, full recompile, stripped:     ${YELLOW}./build.sh -cs${NC}"
+            echo " Build a debug build and run:                         ${YELLOW}./build.sh -dr${NC}"
+            echo ""
+            echo "You can save everything into a log file by doing:"
+            echo " ${YELLOW}./build.sh -<flags> | tee log.txt${NC}"
+            echo ""
             exit 0
             ;;
         c)
@@ -49,7 +53,7 @@ while getopts ":hcdvsr" opt; do
             RUN_AFTER_BUILD="1"
             ;;
         \?)
-            echo "Invalid option: -$OPTARG" >&2
+            echo "${RED}Invalid option: -$OPTARG${NC}" >&2
             exit 1
             ;;
     esac
@@ -69,13 +73,13 @@ cd $BUILD_DIR
 # Display what we're doing and executing cmake
 if [ -n "$BUILD_DEBUG" ]; then
     echo "${YELLOW}COMPILE-INFO:${NC} Compiling in debug mode."
-    cmake -DCMAKE_BUILD_TYPE=Debug ..
+    cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 else
     echo "${YELLOW}COMPILE-INFO:${NC} Compiling in release mode."
-    cmake -DCMAKE_BUILD_TYPE=Release ..
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 fi
 
-# Execute the final make command
+# Execute the final Make command
 if [ -n "$VERBOSE" ]; then
     make VERBOSE=1
 else
@@ -89,7 +93,7 @@ if [ -n "$BUILD_DEBUG" ]; then
 else
     echo "(release)."
 fi
-echo "${YELLOW}COMPILE-INFO:${NC} Game compiled into an executable in: ${RED}$ROOT_DIR/$BUILD_DIR/${NC}"
+echo "${YELLOW}COMPILE-INFO:${NC} Game compiled into an executable in: ${YELLOW}$ROOT_DIR/$BUILD_DIR/${NC}"
 
 # Strip the executable
 if [ -n "$STRIP_IT" ]; then

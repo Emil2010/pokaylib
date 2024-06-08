@@ -3,32 +3,6 @@ cmake_minimum_required(VERSION 3.23)
 project(pokaylib LANGUAGES C)
 
 add_library(pokaylib STATIC)
-
-add_subdirectory(3rd-party/raylib)
-
-target_link_libraries(pokaylib
-    PUBLIC
-        raylib
-)
-
-# only for pokaylib; raylib has too much warnings...
-add_compile_options(
-    -std=c2x
-    # warnings
-    -Wall
-    -Wextra
-    -Wpedantic
-    -Wformat=2
-    -Wno-unused-parameter
-    -Wshadow
-    -Wwrite-strings
-    -Wstrict-prototypes
-    -Wold-style-definition
-    -Wredundant-decls
-    -Wnested-externs
-    -Wmissing-include-dirs
-)
-
 target_sources(pokaylib
     PRIVATE # .c files
         src/pokaylib.c
@@ -42,7 +16,6 @@ target_sources(pokaylib
 )
 
 add_executable(pokexec)
-
 target_sources(pokexec
     PRIVATE
         src/main.c
@@ -56,6 +29,35 @@ target_link_libraries(pokexec
 target_include_directories(pokaylib
     PUBLIC
         include
+)
+
+target_compile_options(pokaylib
+    PUBLIC
+        -std=c2x
+        # Warnings
+        -Wall
+        -Wextra
+        -Wformat=2
+        -Wno-unused-parameter
+        -Wshadow
+        -Wwrite-strings
+        -Wstrict-prototypes
+        -Wold-style-definition
+        -Wredundant-decls
+        -Wnested-externs
+        -Wmissing-include-dirs
+)
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    target_compile_options(pokaylib
+        PUBLIC
+            -Werror
+    )
+endif()
+
+add_subdirectory(3rd-party/raylib)
+target_link_libraries(pokaylib
+    PUBLIC
+        raylib
 )
 
 # Copy resources to build directory
