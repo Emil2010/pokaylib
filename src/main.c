@@ -3,6 +3,7 @@
 #include <raylib.h>
 #include "pokaylib.h"
 #include "config.h"
+#include "maps.h"
 
 int main(void) {
     #ifdef DEBUG
@@ -24,19 +25,18 @@ int main(void) {
     Player player = {
         .position.x = 0.0f,
         .position.y = 0.0f,
-        .owSprites = MakeSprite("assets/player_overworld.png", 10, 16, 16, 0) // the path is relative to the outputed file, not to the source file. build.sh outputs in the root directory.
+        .owSprites = MakeSprite("assets/sprites/CRYSTAL/npc/player_overworld.png", 10, 16, 16, 0)
     };
 
-    Sprite metang = MakeSprite("assets/metang-82x64.png", 32, 82, 64, 0);
-    // Sprite rayquaza = MakeSprite("assets/rayquaza-110x97.png", 28, 110, 97, 0);
-    // Sprite genesect = MakeSprite("assets/genesect-62x70.png", 44, 62, 70, 0);
+    Sprite metang = MakeSprite("assets/sprites/BW/pokemon/metang-82x64.png", 32, 82, 64, 0);
+    Sprite rayquaza = MakeSprite("assets/sprites/BW/pokemon/rayquaza-110x97.png", 28, 110, 97, 0);
+    Sprite genesect = MakeSprite("assets/sprites/BW/pokemon/genesect-62x70.png", 44, 62, 70, 0);
 
     int framesSpeed = 8;
     int framesCounter = 0;
 
-    //extern Map mapData[MAP_COUNT];  // array containing each map, accessible with the MapID enum passed as the index
-    extern Map map_PalletTown;
-    Map currentMap = MakeMap(map_PalletTown);
+    Map currentMap;
+    MakeMap(&currentMap, mapTable[MAP_NATIONAL_PARK]);
 
     // Main game loop -----------------------------------------
     while (!WindowShouldClose())
@@ -50,12 +50,12 @@ int main(void) {
 
             metang.index++;
             if (metang.index >= metang.spriteNumber) metang.index = 0;
-            /*
+
             rayquaza.index++;
             if (rayquaza.index >= rayquaza.spriteNumber) rayquaza.index = 0;
 
             genesect.index++;
-            if (genesect.index >= genesect.spriteNumber) genesect.index = 0;*/
+            if (genesect.index >= genesect.spriteNumber) genesect.index = 0;
         }
 
         // Controls -------------------------------------------
@@ -86,13 +86,11 @@ int main(void) {
 
 
             // draw background tiles
-            //DrawMapLayer(currentMap, 0, SCALING_FACTOR);
+            DrawMapLayer(currentMap, 0, SCALING_FACTOR);
             //DrawSprite(map.tileset, 6, u8 scalingFactor, Vector2 position)
 
-
-
-            DrawSprite(metang, metang.index, SCALING_FACTOR, (Vector2) {300, 50});
-            //DrawSprite(rayquaza, rayquaza.index, SCALING_FACTOR, (Vector2) {30, 150});
+            //DrawSprite(metang, metang.index, SCALING_FACTOR, (Vector2) {(float)screenWidth/4, (float)screenHeight/4});
+            //DrawSprite(rayquaza, rayquaza.index, SCALING_FACTOR, (Vector2) {(float)screenWidth/4*3, (float)screenHeight/4*3});
             //DrawSprite(genesect, genesect.index, SCALING_FACTOR, (Vector2) {(float)screenWidth/2, (float)screenHeight/2});
             DrawSprite(player.owSprites, player.owSprites.index, SCALING_FACTOR, player.position);
 
@@ -108,20 +106,27 @@ int main(void) {
                 DrawText(textX, 40, 0, 20, LIGHTGRAY);
                 DrawText("y:", 10, 20, 20, LIGHTGRAY);
                 DrawText(textY, 40, 20, 20, LIGHTGRAY);
-                //DrawText("frame:", 10, 40, 20, LIGHTGRAY);
-                //DrawText(textFrame, 80, 40, 20, LIGHTGRAY);
+                // DrawText("frame:", 10, 40, 20, LIGHTGRAY);
+                // DrawText(textFrame, 80, 40, 20, LIGHTGRAY);
                 // DrawText(GetWorkingDirectory(), 10, 40, 20, LIGHTGRAY); // show working directory
                 DrawFPS(screenWidth-75, 0);
             #endif
         EndDrawing();
+
+
+
+        //break; // breaks after 1 rendered frame - cool thing to use if we want to see if things are loading/unloading properly
     }
 
     // De-Initialization --------------------------------------
-    DestroySprite(player.owSprites);
-    DestroySprite(metang);
-    DestroyMap(currentMap);
-    //DestroySprite(rayquaza);
-    //DestroySprite(genesect);
+    FreeSprite(player.owSprites);
+    FreeSprite(metang);
+
+    FreeSprite(rayquaza);
+    FreeSprite(genesect);
+
+    FreeMap(currentMap);
+
 
     CloseWindow(); // Close window and OpenGL context
 

@@ -2,14 +2,17 @@ cmake_minimum_required(VERSION 3.23)
 
 project(pokaylib LANGUAGES C)
 
+set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 add_library(pokaylib STATIC)
 target_sources(pokaylib
     PRIVATE # .c files
         src/pokaylib.c
-        src/maps/map-Pallet-town.c
     PUBLIC # .h files
         include/abilities.h
         include/config.h
+        include/maps.h
         include/moves.h
         include/pokaylib.h
         include/pokemons.h
@@ -33,7 +36,6 @@ target_include_directories(pokaylib
 
 target_compile_options(pokaylib
     PUBLIC
-        -std=c2x
         # Warnings
         -Wall
         -Wextra

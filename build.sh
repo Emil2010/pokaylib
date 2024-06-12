@@ -1,6 +1,5 @@
 #!/bin/sh
 # Change your build directory name and executable name here
-BUILD_DIR="build"
 GAME_NAME="pokexec"
 ROOT_DIR=$PWD
 
@@ -9,6 +8,8 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
+MAG='\033[0;35m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Stop the script if a compilation (or something else?) fails
@@ -60,23 +61,32 @@ while getopts ":hcdvsr" opt; do
 done
 
 # Remove the build directory if it exists to do a full recompile
-if [ -d "$BUILD_DIR" ] && [ -n "$BUILD_ALL" ]; then
-    rm -r "$BUILD_DIR"
+if [ -n "$BUILD_ALL" ]; then
+    if [ -d build/debug ] && [ -n "$BUILD_DEBUG" ]; then
+        rm -r build/debug
+    elif [ -d build/release ]; then
+        rm -r build/release
+    fi
 fi
 
-# Create a build directory if it does not exist yet
-if [ ! -d "$BUILD_DIR" ]; then
-    mkdir $BUILD_DIR
+# Create a build directory and /release /debug if they don't exist yet
+if [ ! -d build/debug ] && [ -n "$BUILD_DEBUG" ]; then
+    mkdir -p build/debug
+elif [ ! -d release ]; then
+    mkdir -p build/release
 fi
-cd $BUILD_DIR
 
-# Display what we're doing and executing cmake
+# Display what we're doing and executing CMake
 if [ -n "$BUILD_DEBUG" ]; then
     echo "${YELLOW}COMPILE-INFO:${NC} Compiling in debug mode."
-    cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
-else
+    cmake -B build/debug -DCMAKE_BUILD_TYPE=Debug -Wno-dev .
+    mv build/debug/compile_commands.json ./     # for clangd (it works on my machine)
+    cd build/debug
+elif [ ! -d release ]; then
     echo "${YELLOW}COMPILE-INFO:${NC} Compiling in release mode."
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+    cmake -B build/release -DCMAKE_BUILD_TYPE=Release -Wno-dev .
+    mv build/release/compile_commands.json ./   # for clangd (it works on my machine)
+    cd build/release
 fi
 
 # Execute the final Make command
@@ -89,11 +99,12 @@ fi
 # End of compilation messages
 echo "${YELLOW}COMPILE-INFO:${NC} Compilation done \c"
 if [ -n "$BUILD_DEBUG" ]; then
-    echo "(debug)."
+    echo "${YELLOW}(debug)"
+    echo "COMPILE-INFO:${NC} Game compiled into an executable in: ${YELLOW}$ROOT_DIR/"$BUILD_DIR"debug${NC}"
 else
-    echo "(release)."
+    echo "${YELLOW}(release)"
+    echo "COMPILE-INFO:${NC} Game compiled into an executable in: ${YELLOW}$ROOT_DIR/"$BUILD_DIR"release${NC}"
 fi
-echo "${YELLOW}COMPILE-INFO:${NC} Game compiled into an executable in: ${YELLOW}$ROOT_DIR/$BUILD_DIR/${NC}"
 
 # Strip the executable
 if [ -n "$STRIP_IT" ]; then
@@ -105,17 +116,23 @@ fi
 lib_size=$(du -sh "libpokaylib.a" | cut -f1 | sed 's/K/ko/' | sed 's/M/Mo/')
 exec_size=$(du -sh "pokexec" | cut -f1 | sed 's/K/ko/' | sed 's/M/Mo/')
 assets_size=$(du -sh "assets" | cut -f1 | sed 's/M/Mo/' | sed 's/G/Go/')
+prism_size=$(du -sh "assets/pokeprism" | cut -f1 | sed 's/K/ko/' | sed 's/M/Mo/')
+tilesets_size=$(du -sh "assets/tilesets" | cut -f1 | sed 's/K/ko/' | sed 's/M/Mo/')
+sprites_size=$(du -sh "assets/sprites" | cut -f1 | sed 's/K/ko/' | sed 's/M/Mo/')
 
-max_width=13
-game_name_length=${#GAME_NAME}
-if (( game_name_length > max_width )); then
-    max_width=$game_name_length
-fi
+total_size=$(du -ch "assets" "libpokaylib.a" "pokexec" | grep total$ | cut -f1 | sed 's/K/ko/' | sed 's/M/Mo/' | sed 's/G/Go/')
 
+# Cool ass display box
 echo "╔══════════════════════════════════╗"
-printf "║ ${BLUE}%s${NC} %-${max_width}s %7s ║\n" "SIZE-INFO:" "libpokaylib.a" "$lib_size"
-printf "║ ${BLUE}%s${NC} %-${max_width}s %7s ║\n" "SIZE-INFO:" "$GAME_NAME" "$exec_size"
-printf "║ ${BLUE}%s${NC} %-${max_width}s %7s ║\n" "SIZE-INFO:" "assets/..." "$assets_size"
+echo "║ ${BLUE}SIZE-INFO:${NC}                       ║"
+printf "║     %-20s ${BLUE}%7s${NC} ║\n" "libpokaylib.a" "$lib_size"
+printf "║     %-20s ${BLUE}%7s${NC} ║\n" "$GAME_NAME" "$exec_size"
+printf "║     %-20s ${BLUE}%7s${NC} ║\n" "assets/..." "$assets_size"
+# printf "║     %-20s ${CYAN}%7s${NC} ║\n" "      /pokeprism/..." "$prism_size"
+# printf "║     %-20s ${CYAN}%7s${NC} ║\n" "      /tilesets/..." "$tilesets_size"
+# printf "║     %-20s ${CYAN}%7s${NC} ║\n" "      /sprites/..." "$sprites_size"
+printf "║     ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌ ║\n"
+printf "║     %-20s ${BLUE}%7s${NC} ║\n" "total" "$total_size"
 echo "╚══════════════════════════════════╝"
 
 # Grant execute permission and rename it
@@ -128,4 +145,4 @@ if [ -n "$RUN_AFTER_BUILD" ]; then
 fi
 
 # Go back to the root directory
-cd ..
+cd "$ROOT_DIR"

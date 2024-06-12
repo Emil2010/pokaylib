@@ -2,15 +2,22 @@
 
 #include <stdint.h>
 #include <raylib.h>
-
 #include "abilities.h"
 #include "moves.h"
+#include "maps.h"
 
 // Typedef ----------------------------------------------------
 typedef uint8_t u8;     //    256
 typedef uint16_t u16;   // 65 535
 
 // Macros -----------------------------------------------------
+#define YELLOW_PRINT printf("\033[0;33m")
+#define RED_PRINT printf("\033[0;31m")
+#define GREEN_PRINT printf("\033[0;32m")
+#define BLUE_PRINT printf("\033[0;34m")
+#define MAG_PRINT printf("\033[0;35m")
+#define CYAN_PRINT printf("\033[0;36m")
+#define NO_COLOR printf("\033[0m")
 
 // Enums ------------------------------------------------------
 typedef enum {
@@ -35,14 +42,7 @@ typedef enum {
     FAIRY
 } Type;
 
-typedef enum {
-    MAP_PALLET_TOWN,
-    MAP_ROUTE_1,
-    MAP_ROUTE_1_HOUSE_A,
-    MAP_ROUTE_2,
-    //
-    MAP_COUNT,
-} MapID;
+
 
 // Structs ----------------------------------------------------
 typedef struct {
@@ -110,8 +110,7 @@ typedef struct {
     u8 height;      // map height (tile-wise)
     u8 layersNumber;// how much layers the map have
     u16 tilesNumber; // how much tiles the map have (width * height)
-    u8 **layerData; // dynamically allocated layers
-    u8 **tiles;     // tiles[layer][tile]
+    u8 ***tiles;     // tiles[layer][tileType]
 } Map;
 
 // Player -----------------------------------------------------
@@ -123,8 +122,10 @@ typedef struct {
 
 // Functions --------------------------------------------------
 Sprite MakeSprite(const char *spritesheetPath, u8 framesNumber, u8 spriteWidth, u8 spriteHeight, u8 frameOffset);
-void DestroySprite(Sprite sprite);
+void MakeMap(Map *map, const char *mapData);
+
 void DrawSprite(Sprite sprite, u8 frameIndex, u8 scalingFactor, Vector2 position);
-Map MakeMap(Map data);
 void DrawMapLayer(Map map, u8 layerIndex, u8 scalingFactor);
-void DestroyMap(Map map);
+
+void FreeSprite(Sprite sprite);
+void FreeMap(Map map);
