@@ -28,6 +28,14 @@ int main(void) {
         .owSprites = MakeSprite("assets/sprites/CRYSTAL/npc/player_overworld.png", 10, 16, 16, 0)
     };
 
+    Camera2D camera = {
+        .offset = (Vector2){(float)screenWidth/2, (float)screenHeight/2},
+        .target = (Vector2){0, 0},
+        .rotation = 0.0f,
+        .zoom = 1.0f,
+    };
+
+
     Sprite metang = MakeSprite("assets/sprites/BW/pokemon/metang-82x64.png", 32, 82, 64, 0);
     Sprite rayquaza = MakeSprite("assets/sprites/BW/pokemon/rayquaza-110x97.png", 28, 110, 97, 0);
     Sprite genesect = MakeSprite("assets/sprites/BW/pokemon/genesect-62x70.png", 44, 62, 70, 0);
@@ -36,7 +44,8 @@ int main(void) {
     int framesCounter = 0;
 
     Map currentMap;
-    MakeMap(&currentMap, mapTable[MAP_NATIONAL_PARK]);
+    //MakeMap(&currentMap, mapTable[MAP_PALLET_TOWN]);
+    MakeMap(&currentMap, mapTable[MAP_ICE_PATH_B1F]);
 
     // Main game loop -----------------------------------------
     while (!WindowShouldClose())
@@ -58,6 +67,8 @@ int main(void) {
             if (genesect.index >= genesect.spriteNumber) genesect.index = 0;
         }
 
+
+
         // Controls -------------------------------------------
         if (IsKeyPressed(KEY_LEFT)) {
             player.position.x -= 16 * SCALING_FACTOR;
@@ -72,6 +83,8 @@ int main(void) {
             player.position.y -= 16 * SCALING_FACTOR;
             player.owSprites.index = 4;
         }
+        camera.offset = (Vector2){(float)GetScreenWidth()/2, (float)GetScreenHeight()/2};
+        camera.target = player.position;
 
         // Debug ----------------------------------------------
         #ifdef DEBUG
@@ -82,9 +95,9 @@ int main(void) {
 
         // Draw -----------------------------------------------
         BeginDrawing();
-            ClearBackground(GRAY);
+            //ClearBackground(GRAY);
 
-
+            BeginMode2D(camera);
             // draw background tiles
             DrawMapLayer(currentMap, 0, SCALING_FACTOR);
             //DrawSprite(map.tileset, 6, u8 scalingFactor, Vector2 position)
@@ -95,13 +108,22 @@ int main(void) {
             DrawSprite(player.owSprites, player.owSprites.index, SCALING_FACTOR, player.position);
 
 
-            // draw front tiles
+            EndMode2D();
+
 
             #ifdef DEBUG
+                // grid
+                 for (int i = 0; i < 20; i++) {
+                    DrawLine(screenWidth/2 - (currentMap.tileSize*i*SCALING_FACTOR*2), 0, screenWidth/2 - (currentMap.tileSize*i*SCALING_FACTOR*2), screenHeight, BLUE);
+                    DrawLine(screenWidth/2 + (currentMap.tileSize*i*SCALING_FACTOR*2), 0, screenWidth/2 + (currentMap.tileSize*i*SCALING_FACTOR*2), screenHeight, BLUE);
+                    DrawLine(0, screenHeight/2 - (currentMap.tileSize*i*SCALING_FACTOR*2), screenWidth, screenHeight/2 - (currentMap.tileSize*i*SCALING_FACTOR*2), BLUE);
+                    DrawLine(0, screenHeight/2 + (currentMap.tileSize*i*SCALING_FACTOR*2), screenWidth, screenHeight/2 + (currentMap.tileSize*i*SCALING_FACTOR*2), BLUE);
+                }
                 // cross
+                /*
                 DrawLine(screenWidth/2, 0, screenWidth/2, screenHeight, RAYWHITE);
                 DrawLine(0, screenHeight/2, screenWidth, screenHeight/2, RAYWHITE);
-
+                */
                 DrawText("x:", 10, 0, 20, LIGHTGRAY);
                 DrawText(textX, 40, 0, 20, LIGHTGRAY);
                 DrawText("y:", 10, 20, 20, LIGHTGRAY);

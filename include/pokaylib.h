@@ -102,15 +102,14 @@ typedef struct {
 // Tileset
     Sprite tileset;
     const char *tilesetPath;    // path to the tileset spritesheet
-    u8 tilesetSpritesNumber;   // tileset's number of sprites
-    u8 tileWidth;   // tileset's tile width - TODO : as tilesets are always square, maybe regroup width and height in the same variable
-    u8 tileHeight;  // tileset's tile height
+    u8 tilesetSpritesNumber;    // tileset's number of sprites
+    u8 tileSize;               // tileset's tile size (px*px)
 // Map
-    u8 width;       // map width (tile-wise)
-    u8 height;      // map height (tile-wise)
-    u8 layersNumber;// how much layers the map have
-    u16 tilesNumber; // how much tiles the map have (width * height)
-    u8 ***tiles;     // tiles[layer][tileType]
+    u8 width;                   // map width (tile-wise)
+    u8 height;                  // map height (tile-wise)
+    u8 layersNumber;            // how much layers the map have
+    u16 tilesNumber;            // how much tiles the map have (width * height)
+    u8 ***tiles;                // tiles[layer][tileType]
 } Map;
 
 // Player -----------------------------------------------------

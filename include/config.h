@@ -23,8 +23,9 @@
 
 #ifndef NDEBUG
 # define DEBUG
+# define SHOW_MAP false // shows the tile values in the console - may be not super nice if the map is big
 #endif
 
-#define SCALING_FACTOR 4
-#define SCREEN_WIDTH NINTENDO_DS_SCREEN_WIDTH
-#define SCREEN_HEIGHT NINTENDO_DS_SCREEN_HEIGHT
+#define SCALING_FACTOR 3
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 288

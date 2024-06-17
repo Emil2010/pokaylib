@@ -97,12 +97,11 @@ void MakeMap(Map *map, const char *mapData)
     }
 
     // Read the first line for map properties
-    fscanf(mapFile, "%hhu %hhu %hhu %hhu %hhu %hhu\n",
+    fscanf(mapFile, "%03hhu %03hhu %03hhu %03hhu %03hhu\n",
         &map->width,
         &map->height,
         &map->tilesetSpritesNumber,
-        &map->tileWidth,
-        &map->tileHeight,
+        &map->tileSize,
         &map->layersNumber
     );
     fscanf(mapFile, "%s\n", tilesetPath);
@@ -122,8 +121,8 @@ void MakeMap(Map *map, const char *mapData)
     map->tileset = MakeSprite(
                     tilesetPath,
                     map->tilesetSpritesNumber,
-                    map->tileWidth,
-                    map->tileHeight,
+                    map->tileSize,
+                    map->tileSize,
                     0
                 );
 
@@ -136,19 +135,20 @@ void MakeMap(Map *map, const char *mapData)
         TraceLog(LOG_DEBUG,"    Map height:\t%d", map->height);
         TraceLog(LOG_DEBUG,"    Map tiles:\t%d", map->width * map->height);
         TraceLog(LOG_DEBUG,"    Map layers:\t%d", map->layersNumber);
-        TraceLog(LOG_DEBUG,"    Tile width:\t%dpx", map->tileWidth);
-        TraceLog(LOG_DEBUG,"    Tile height:\t%dpx", map->tileHeight);
-        TraceLog(LOG_DEBUG,"    Map size:\t%dx%dpx", map->tileWidth * map->width, map->tileHeight * map->height);
+        TraceLog(LOG_DEBUG,"    Tile size:\t%d*%dpx", map->tileSize, map->tileSize);
+        TraceLog(LOG_DEBUG,"    Map size:\t%dx%dpx", map->tileSize * map->width, map->tileSize * map->height);
         MAG_PRINT;
-        for (int i = 0; i < map->layersNumber; i++) {    // layer
-            printf("MAP: Layer[%d]\n", i);
-            for (int j = 0; j < map->height; j++) {      // x
-                for (int k = 0; k < map->width; k++) {   // y
-                    printf("%3hhu ", map->tiles[i][j][k]);
+        #if SHOW_MAP
+            for (int i = 0; i < map->layersNumber; i++) {    // layer
+                printf("MAP: Layer[%d]\n", i);
+                for (int j = 0; j < map->height; j++) {      // x
+                    for (int k = 0; k < map->width; k++) {   // y
+                        printf("%3hhu ", map->tiles[i][j][k]);
+                    }
+                    printf("\n");
                 }
-                printf("\n");
             }
-        }
+        #endif
         NO_COLOR;
     #endif
 
@@ -161,6 +161,8 @@ void DrawMapLayer(Map map, u8 layerIndex, u8 scalingFactor)
     // eg. the width/height of the map is set to some numbers,but the
     // actual data parsed (matrix) does not have that size.
 
+    int F = map.tileSize * scalingFactor;
+
     for (int i = 0; i < map.height; i++) {
         for (int j = 0; j < map.width; j++) {
             // printf("[%d][%d][%d]\n", layerIndex, i, j);
@@ -169,8 +171,8 @@ void DrawMapLayer(Map map, u8 layerIndex, u8 scalingFactor)
                 map.tiles[layerIndex][i][j],
                 scalingFactor,
                 (Vector2) {
-                    j * map.tileWidth * scalingFactor,
-                    i * map.tileHeight * scalingFactor,
+                    j * F - map.tileSize,   // - map.tileSize recenter
+                    i * F - map.tileSize,
             });
         }
     }
@@ -178,6 +180,12 @@ void DrawMapLayer(Map map, u8 layerIndex, u8 scalingFactor)
 
 void FreeMap(Map map)
 {
-    free(map.tiles);
     FreeSprite(map.tileset);
+    for (int i = 0; i < map.layersNumber; i++) {
+        for (int j = 0; j < map.height; j++) {
+            free(map.tiles[i][j]);
+        }
+        free(map.tiles[i]);
+    }
+    free(map.tiles);
 }
