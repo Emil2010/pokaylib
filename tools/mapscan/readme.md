@@ -6,10 +6,11 @@ Tried with bitmap but... I failed...
 Convert the `png` into `css` in Aseprite, then remove the first lines of informations, and at the end change the `; }` to `,`.
 
 ```
-$> ./mapscan <map>.dat <tileset>.dat <tile size>
+$> ./mapscan <map>.css <tileset>.css <tile size>
 ```
 
-The parses the tileset's pixel channels, then compare it pixel by pixel to the map.
+The program parses the tileset's pixels channels (R,G,B), then compare it pixel by pixel to the map.
+It outputs a `output.dat` file.
 
 TODO:
 - rewrite it with bitmap support because it's fun
