@@ -175,4 +175,5 @@ build/
 .cache/
 roadmap.md
 .DS_Store
-.log.txt
+log.txt
+*.css
