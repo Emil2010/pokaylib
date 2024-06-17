@@ -6,7 +6,7 @@ Tried with bitmap but... I failed...
 Convert the `png` into `css` in Aseprite, then remove the first lines of informations, and at the end change the `; }` to `,`.
 
 ```
-$> ./mapscan <map>.css <tileset>.css <tile size>
+~$ ./mapscan <map>.css <tileset>.css <tile size>
 ```
 
 The program parses the tileset's pixels channels (R,G,B), then compare it pixel by pixel to the map.

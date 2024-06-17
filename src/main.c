@@ -83,7 +83,7 @@ int main(void) {
             player.position.y -= 16 * SCALING_FACTOR;
             player.owSprites.index = 4;
         }
-        camera.offset = (Vector2){(float)GetScreenWidth()/2, (float)GetScreenHeight()/2};
+
         camera.target = player.position;
 
         // Debug ----------------------------------------------
@@ -95,7 +95,7 @@ int main(void) {
 
         // Draw -----------------------------------------------
         BeginDrawing();
-            //ClearBackground(GRAY);
+            ClearBackground(BLACK);
 
             BeginMode2D(camera);
             // draw background tiles
@@ -114,10 +114,10 @@ int main(void) {
             #ifdef DEBUG
                 // grid
                  for (int i = 0; i < 20; i++) {
-                    DrawLine(screenWidth/2 - (currentMap.tileSize*i*SCALING_FACTOR*2), 0, screenWidth/2 - (currentMap.tileSize*i*SCALING_FACTOR*2), screenHeight, BLUE);
-                    DrawLine(screenWidth/2 + (currentMap.tileSize*i*SCALING_FACTOR*2), 0, screenWidth/2 + (currentMap.tileSize*i*SCALING_FACTOR*2), screenHeight, BLUE);
-                    DrawLine(0, screenHeight/2 - (currentMap.tileSize*i*SCALING_FACTOR*2), screenWidth, screenHeight/2 - (currentMap.tileSize*i*SCALING_FACTOR*2), BLUE);
-                    DrawLine(0, screenHeight/2 + (currentMap.tileSize*i*SCALING_FACTOR*2), screenWidth, screenHeight/2 + (currentMap.tileSize*i*SCALING_FACTOR*2), BLUE);
+                    DrawLine(screenWidth/2 - (currentMap.tileSize*i*SCALING_FACTOR*2) + SCALING_FACTOR*8, 0, screenWidth/2 - (currentMap.tileSize*i*SCALING_FACTOR*2) + SCALING_FACTOR*8, screenHeight, BLUE);
+                    DrawLine(screenWidth/2 + (currentMap.tileSize*i*SCALING_FACTOR*2) + SCALING_FACTOR*8, 0, screenWidth/2 + (currentMap.tileSize*i*SCALING_FACTOR*2) + SCALING_FACTOR*8, screenHeight, BLUE);
+                    DrawLine(0, screenHeight/2 - (currentMap.tileSize*i*SCALING_FACTOR*2) + SCALING_FACTOR*8, screenWidth, screenHeight/2 - (currentMap.tileSize*i*SCALING_FACTOR*2) + SCALING_FACTOR*8, BLUE);
+                    DrawLine(0, screenHeight/2 + (currentMap.tileSize*i*SCALING_FACTOR*2) + SCALING_FACTOR*8, screenWidth, screenHeight/2 + (currentMap.tileSize*i*SCALING_FACTOR*2) + SCALING_FACTOR*8, BLUE);
                 }
                 // cross
                 /*

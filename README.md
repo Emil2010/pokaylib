@@ -1,5 +1,6 @@
 # pokaylib
-This project aims to be a Pokemon "engine" written in C with [raylib](https://github.com/raysan5/raylib).
+This project aims to be a Pokemon clone written in C with [raylib](https://github.com/raysan5/raylib).
+The first goal is to make a Pokemon Crystal clone (2D is easier), then implement each generation style from the 1st gen to the 5th.
 
 ## Structure
 pokaylib's organization is such that:
@@ -38,4 +39,4 @@ You can change the build directory name in the `build.sh` script, as well as the
 ---
 
 ## Additional credits
-The sprites found in `assets/pokeprism` are taken from the [Pokemon Prism](https://rainbowdevs.com/title/prism/) fangame. The `assets` folder is not well organized right now, this will change in the future.
+The sprites found in `assets/sprites/pokeprism` are taken from the [Pokemon Prism](https://rainbowdevs.com/title/prism/) fangame. The `assets` folder is not well organized right now, this will change in the future.

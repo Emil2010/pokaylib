@@ -116,9 +116,9 @@ fi
 lib_size=$(du -sh "libpokaylib.a" | cut -f1 | sed 's/K/ko/' | sed 's/M/Mo/')
 exec_size=$(du -sh "pokexec" | cut -f1 | sed 's/K/ko/' | sed 's/M/Mo/')
 assets_size=$(du -sh "assets" | cut -f1 | sed 's/M/Mo/' | sed 's/G/Go/')
-prism_size=$(du -sh "assets/pokeprism" | cut -f1 | sed 's/K/ko/' | sed 's/M/Mo/')
-tilesets_size=$(du -sh "assets/tilesets" | cut -f1 | sed 's/K/ko/' | sed 's/M/Mo/')
-sprites_size=$(du -sh "assets/sprites" | cut -f1 | sed 's/K/ko/' | sed 's/M/Mo/')
+# prism_size=$(du -sh "assets/pokeprism" | cut -f1 | sed 's/K/ko/' | sed 's/M/Mo/')
+# tilesets_size=$(du -sh "assets/tilesets" | cut -f1 | sed 's/K/ko/' | sed 's/M/Mo/')
+# sprites_size=$(du -sh "assets/sprites" | cut -f1 | sed 's/K/ko/' | sed 's/M/Mo/')
 
 total_size=$(du -ch "assets" "libpokaylib.a" "pokexec" | grep total$ | cut -f1 | sed 's/K/ko/' | sed 's/M/Mo/' | sed 's/G/Go/')
 
