@@ -1,5 +1,7 @@
 #pragma once
 
+// all pokemon are listed in national dex order
+
 typedef enum {
     NO_POKEMON,
 // GEN-1
@@ -655,4 +657,44 @@ typedef enum {
     KELDEO,
     MELOETTA,
     GENESECT,
+/* Miscellaneous cross-generational evolutionary relative
+ *  gen 6
+ *
+ *  SYLVEON
+ *
+ *  gen 7 has no cross-gen evos
+ *
+ *  gen 8
+ *
+ *  sword and shield
+ *
+ *  OBSTAGOON
+ *  PERRSERKER
+ *  CURSOLA
+ *  SIRFETCHD
+ *  MR_RIME
+ *  RUNERIGUS
+ *
+ *  legends arceus
+ *
+ *  WYRDEER
+ *  KLEAVOR
+ *  URSALUNA
+ *  BASCULEGION
+ *  SNEASLER
+ *  OVERQUIL
+ *
+ *  gen 9
+ *
+ *  scarlett and violet
+ *
+ *  Annihilape
+ *  CLODSIRE
+ *  FARIGIRAF
+ *  DUDUNSPARCE
+ *  KINGAMBIT
+ *
+ *  legends Z-A
+ *  no new pokemon are shown yet
+ */
 } Pokemon;
